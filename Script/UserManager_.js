@@ -11,18 +11,40 @@ Broadcast.send("Common"); //Common 불러오기
 Broadcast.send("Object"); //Object 불러오기
 
 Broadcast.send("DataBase"); //DataBase 불러오기
-Broadcast.send("RecordManager"); //RecordManager 불러오기
+// Broadcast.send("RecordManager"); //RecordManager 불러오기
 Broadcast.send("SystemManager"); //SystemManager 불러오기
 
 function UserManager() {
-  let userList = [], userOptionList = [];
+  let userList = [],
+    userOptionList = [];
   let UserDump = new Common.DumpModule();
   let OptDump = new Common.DumpModule();
-  
-  let Load = function() {
+
+  let Load = function () {
     let UserList = Common.read(Default.fileNameList["UserList"]);
-    for (let i = 0; i < tmpList.length; i++) {
-      userList.push(funcObject.)
+    for (let i = 0; i < tmpList.length; i++) userList.push(clsUser(tmpList[i]));
+  }();
+
+  let Contain = function (id) {
+    for (let i = 0; i < userList.length; i++) {
+      if (userList[i].name === id) return i;
     }
-  }
+    return false
+  };
+
+  let Find = function (id) {
+    for (let i = 0; i < UserDump.dumpList.length; i++) {
+      if (UserDump.dumpList[i].name === id) {
+        UserDump.resetTimeStemp(i);
+        return UserDump.dumpList[i];
+      }
+    }
+    for (let i = 0; i < userList.length; i++) {
+      if (userList[i].name === id) {
+        UserDump.addDump(userList[i]);
+        return userList[i];
+      }
+    }
+    return null;
+  };
 }

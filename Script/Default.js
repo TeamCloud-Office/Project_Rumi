@@ -51,21 +51,22 @@ function funcDefault() {
 
     rootPath: "sdcard/TeamCloud/",
     fileList: {
-      UserList: "BotData/Users/UserList.json",
-      AttenList: "BotData/Game/AttenList.json",
-      SetList: "BotData/ETC/SetList.json",
-      StockList: "BotData/Game/StockList.json",
-      PostList: "BotData/Users/PostList.json"
+      UserList: "Rumi_Data/Users/UserList.json",
+      AttenList: "Rumi_Data/Game/AttenList.json",
+      SetList: "Rumi_Data/ETC/SetList.json",
+      StockList: "Rumi_Data/Game/StockList.json",
+      PostList: "Rumi_Data/Users/PostList.json",
+      // RecordList: "Rumi_Data/Records/RecordList.json"
     },
 
     DBFileList: {
-      Message: "BotData/DB/Message.json",
-      NicknameItem: "BotData/DB/NicknameItem.json",
-      StarsItem: "BotData/DB/StarsItem.json",
-      FoodItem: "BotData/DB/FoodItem.json",
-      TicketItem: "BOtData/DB/TicketItem.json",
-      MandrelItem: "BotData/DB/MandrelItem.json",
-      MineralItem: "BotData/DB/MineralItem.json"
+      Message: "Rumi_Data/DB/Message.json",
+      NicknameItem: "Rumi_Data/DB/NicknameItem.json",
+      StarsItem: "Rumi_Data/DB/StarsItem.json",
+      FoodItem: "Rumi_Data/DB/FoodItem.json",
+      TicketItem: "Rumi_Data/DB/TicketItem.json",
+      MandrelItem: "Rumi_Data/DB/MandrelItem.json",
+      MineralItem: "Rumi_Data/DB/MineralItem.json"
     },
 
     ItemType: {

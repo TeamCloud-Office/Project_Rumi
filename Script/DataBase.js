@@ -197,6 +197,13 @@ function funcDBManager() {
       if (key === "ManderlItem") return (this.Find("ManderItem", "itemName", value) !== null ? true : false);
       if (key === "MineralItem") return (this.Find("MineralItem", "itemName", value) !== null ? true : false);
       return "";
+    },
+
+    getProperty: function (idx) {
+      return this.Find("Property", "index", idx);
+    },
+    getPropertyList: function (rcdname) {
+      return this.Find("Property", "recordname", rcdname);
     }
   }
 }
