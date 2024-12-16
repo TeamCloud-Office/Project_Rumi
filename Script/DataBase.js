@@ -199,12 +199,6 @@ function funcDBManager() {
       return "";
     },
 
-    getProperty: function (idx) {
-      return this.Find("Property", "index", idx);
-    },
-    getPropertyList: function (rcdname) {
-      return this.Find("Property", "recordname", rcdname);
-    }
   }
 }
 

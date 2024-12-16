@@ -35,7 +35,7 @@ function clsUserInfo(info) { //info = {id: "id", name: "name"}
 }
 
 
-function clsUser(userInfo) { 
+function clsUser(userInfo) {
 
   let FindInventory = function (type, itemName) {
     return userInfo.inventory.find(i => i.type === type && i.name === itemName);
@@ -53,7 +53,7 @@ function clsUser(userInfo) {
         ban: userInfo.ban,
         warn: userInfo.warn,
         coin: userInfo.coin,
-        nicknames: userInfo.nickname,
+        badges: userInfo.badges,
         stocks: userInfo.stocks,
         membership: {
           signUpDate: userInfo.membership.signUpDate,
@@ -95,10 +95,10 @@ function clsUser(userInfo) {
     addItem: function (type, itemName, itemCount) { //가방에 물건 추가하기
       let item = FindInventory(type, itemName); //물건 찾기
       if (!item) userInfo.inventory.push({ //가지고 있지 않다면 물건 추가하기
-          type: type,
-          name: itemName,
-          count: itemCount
-        });
+        type: type,
+        name: itemName,
+        count: itemCount
+      });
       item.count = Number(item.count) + Number(count); //가지고 있다면 물건 개수 증가하기
     },
     removeItem: function (type, itemName, itemCount) { //가방에 물건 삭제하기
@@ -135,25 +135,22 @@ function clsUser(userInfo) {
 }
 
 
-// function clsUserRecord(userInfo) {
-//   return {
-//     EATING: "eatfood", //act = {eating, sleeping}
-//     SLEEPING: "sleep",
-//     name: userInfo.name,
-//     getJson: function () {
-//       return {
-//         name: userInfo.name,
-//         act: userInfo.act
-//       };
-//     },
-//     addAction: function (act) {
-//       action[act]++;
-//     },
-//     getAction: function (act) {
-//       return action[act]
-//     }
-//   }
-// }
+function clsUserRecord(userInfo) {
+  return {
+    getJson: function () {
+      return {
+        name: userInfo.name,
+        act: userInfo.act
+      };
+    },
+    addAction: function (act) {
+      userInfo.action = `${act}를 했어요.`;
+    },
+    getAction: function () {
+      return userInfo.action
+    }
+  }
+}
 
 
 function clsAttendance(info) {

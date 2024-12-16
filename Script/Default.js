@@ -41,7 +41,7 @@ function funcDefault() {
     DumpTimeOut: 5 * 60 * 1000,
 
     DefaultCoin: 50000, //초기 기본 Coin
-    BettingLimit: 1000000, //최대 도박 한도
+    BettingCoinLimit: 1000000, //최대 도박 한도
     MaxRemittance: 500000, //최대 송금 한도
     MiningDefaultSpeed: 60 * 1000, //채굴 시간 (ms)
     BackupTime: 5, // 60// 1000, //자동 백업 시간
@@ -61,7 +61,7 @@ function funcDefault() {
 
     DBFileList: {
       Message: "Rumi_Data/DB/Message.json",
-      NicknameItem: "Rumi_Data/DB/NicknameItem.json",
+      BadgeItem: "Rumi_Data/DB/BadgeItem.json",
       StarsItem: "Rumi_Data/DB/StarsItem.json",
       FoodItem: "Rumi_Data/DB/FoodItem.json",
       TicketItem: "Rumi_Data/DB/TicketItem.json",
@@ -70,12 +70,12 @@ function funcDefault() {
     },
 
     ItemType: {
-      NicknameItem: "NicknameItem",
-      StarsItem: "StarsItem",
-      FoodItem: "FoodItem",
-      TicketItem: "TicketItem",
-      MandrelItem: "MandrelItem",
-      MineralItem: "MineralItem"
+      BadgeItem: "BadgeItem", //배지
+      StarsItem: "StarsItem", //멤버쉽
+      FoodItem: "FoodItem", //음식
+      TicketItem: "TicketItem", //사용권
+      MandrelItem: "MandrelItem", //곡괭이
+      MineralItem: "MineralItem" //광석
     }
   }
 }
