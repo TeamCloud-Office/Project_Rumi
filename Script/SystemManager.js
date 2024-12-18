@@ -11,9 +11,9 @@ Broadcast.send("Default"); //Default 불러오기
 Broadcast.send("Common"); //Common 불러오기
 Broadcast.send("UserManager"); //UserManager 불러오기
 
-let MasterRoom = "TeamCloud 개발방"; //관리방
+let MasterRoom = Defaulf.MainRoomName; //관리방
 let threadQueue = [];
-let CompileList = ["Defalt.js", "Common.js", "DataBase.js", "Helper.js", "Object.js", "UserManger.js", "Main.js"];
+let CompileList = ["Defalt.js", "Common.js", "DataBase.js", "Helper.js", "Object.js", "FriendsManager.js", "UserManger.js", "RecordManager.js", "Main.js"];
 let BackupList = Defaulf.fileList;
 
 let funcSystemManager = (function () {
@@ -172,12 +172,12 @@ let funcSystemManager = (function () {
     },
     postMessage: function (id, name, itemList, coin, message) {
       PostList.push({
+        index: (PostList.length + 1),
         name: name,
         id: id,
         items: itemList,
         coin: coin,
-        message: message,
-        index: (PostList.length + 1)
+        message: message
       });
       write(PostFile, PostList);
     },

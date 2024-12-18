@@ -140,11 +140,14 @@ function clsUserRecord(userInfo) {
     getJson: function () {
       return {
         name: userInfo.name,
-        act: userInfo.act
+        action: userInfo.action
       };
     },
-    addAction: function (act) {
-      userInfo.action = `${act}를 했어요.`;
+    addAction: function (type, time, act) {
+      let count = userInfo.action[type].length + 1
+      userInfo.action[type].push({
+        count: [time, act]
+      });
     },
     getAction: function () {
       return userInfo.action

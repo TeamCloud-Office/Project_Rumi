@@ -55,16 +55,14 @@ function RecordManager() {
     return jsonArr;
   }
 
-  let CreateRecord = function (id, name, coin) {
+  let CreateRecord = function (id, name) {
     let obj = {
       name: name,
       id: id,
-      coin: coin,
-      act: {
-        eatfood: 0,
-        sleep: 0
+      action: {
+        user_message: [],
+        bot_message: []
       },
-      chatCount: 0
     };
     recordList.push(userRecord(obj));
   }
@@ -74,18 +72,29 @@ function RecordManager() {
   }
 
   return {
-    Delete : function (id) {
+    Delete: function (id) {
       Delete(id);
     },
-    newRecord : function (id, name, coin) {
+    newRecord: function (id, name, coin) {
       CreateRecord(id, name, coin);
     },
-    
-    rcdAction: function (id, actionName) {
+
+    rcdAction: function (id, type, action) {
+      let date = new Date()
+      let time = [date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds()];
+
       let rcd = Find(id);
-      if (rcd === null) return;
-      rcd.addAction(actionName);
+      if (rcd === null) {
+        let rcdH = FindByHash(id);
+        if (rcdH === null) return;
+        rcdH.addAction(type, time, action);
+        Save();
+      }
+      rcd.addAction(type, time, action);
       Save();
-    },
+      //type: [user, bot]
+      //time: '
+      //action: {user: `~을(를) 시도함.`, bot: `~을(를) ##함.`}
+    }
   };
 }

@@ -6,18 +6,19 @@
 // 본 코드는 TeamCloud의 저작물로 TeamCloud의 코드 라이선스(CCL BY-SA 2.0)를 따라야합니다.
 /////////////////
 
-Broadcast.send("Default"); //변수들 모음
-Broadcast.send("Helper"); //도움말 객체
-Broadcast.send("userManager"); //유저 담당 객체
-Broadcast.send("TCApi"); //팀클라우드 Api 객체
-Broadcast.send("Common"); //일반 function 모음
+Broadcast.send("Default"); //Default 불러오기
+Broadcast.send("Common"); //Common 불러오기
+Broadcast.send("Helper"); //Helper 불러오기
+Broadcast.send("UserManager"); //UserManager 불러오기
 
-Broadcast.send("SystemManager"); //시스템 담당 객체
-Broadcast.send("DataBase"); //데이터 담당 객체
-
-let ActingList = []; //도배 감지 {room, flag:(Y or N)}
+Broadcast.send("RecordManager"); //RecordManager 불러오기
+Broadcast.send("SystemManager"); //SystemManager 불러오기
+Broadcast.send("FriendsManager"); //FriendsManager 불러오기
+Broadcast.send("DataBase"); //DataBase 불러오기
 
 function onMessage(msg) {
+
+  let botMessage = JSON.parse(Common.read(Default.fileList["Message"]));
 
 
   if (msg.content == `${Default.prefix} 기본정보`) {
@@ -38,14 +39,14 @@ function onMessage(msg) {
     } else {
       if (msg.isGroupChat) return;
       if (msg.startsWith(Default.prefix)) {
-        if (checkCmdING(msg.room.name)) return msg.reply(`현재 명령어를 실행중이에요. 나중에 다시 시도해주세요!`);
-        msg.reply(setCmdING(msg.room.name, true));
+        if (checkCommandING(msg.room.name)) return msg.reply(`현재 명령어를 실행중이에요. 나중에 다시 시도해주세요!`);
+        msg.reply(setCommandING(msg.room.name, true));
       }
       try {
-        msg.reply(userCmd(msg.room.name, msg.content, msg.author.name, msg.author.hash))
+        msg.reply(userCommand(msg.room.name, msg.content, msg.author.name, msg.author.hash))
       } catch (e) {
         Common.logE([
-          `[Error]`,
+          botMessage["Error"].getRandom(),
           `room: ${msg.room.name}`,
           `sender: ${msg.author.name} (${msg.author.hash})`,
           `errorTitle: ${e.name}`,
@@ -53,15 +54,10 @@ function onMessage(msg) {
           `errorStack: ${e.stack}`
         ].join("\n"));
         msg.reply([
-          `어라..? 머리가 어질어질...`,
+          botMessage["Bug"].getRandom(),
           `[${e.name}: ${e.message}]`,
           `[${e.stack}]`
         ].join("\n"));
-      } finally {
-        if (msg.startsWith(Default.prefix)) {
-          java.lang.Thread.sleep(200);
-          msg.reply(setCmdING(msg.room.name, false));
-        }
       }
     }
 
@@ -70,12 +66,73 @@ function onMessage(msg) {
   }
 }
 
-function userCmd(roomName, message, authorName, authorHash) {
+function userCommand(roomName, message, authorName, authorHash, reply) {
   if (message == `${Default.prefix} 등록`) {
-    if (userManager.set()) {}
+    let userId = '';
+    let list = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split(''); //배열로 변경
+    do {
+      for (let i = 0; i < 5; i++) {
+        userId += list.getRandom();
+      }
+    } while ((UserManager.contain(userId) !== false ? true : false)); //사용자 검색이 될 경우(되지 않지 않았을 경우) true 반환
+    if (UserManager.makeUser(authorName, userId, authorHash)) {
+      RecordManager.rcdAction(userId, "user", "회원가입을 시도함.");
+      bot.send(Default.MainRoomName, `[${authorName}]님이 회원가입을 완료했어요`);
+      RecordManager.rcdAction(userId, "bot", `회원가입을 완료함.`);
+      reply(`회원가입을 완료했어요:)`);
+    } else {
+      RecordManager.rcdAction(authorHash, "user", `회원가입을 시도함.`)
+      reply(`이미 회원가입을 완료했어요.`)
+      RecordManager.rcdAction(authorHash, "bot", `회원가입을 실패함.(이미 회원가입을 완료함.)`)
+    }
   }
-}
-//11/24 수정
-function checkCmdING(roomName) {
+  if (message === `${Default.prefix} 계정정보`) reply(`${UserManager.UserInfo}`);
 
+  if (message.includes(`${Default.prefix} 친구`)) {
+    let splitMessage = message.split(" ");
+
+    if (splitMessage[2] === "추가") {
+      RecordManager.rcdAction(authorHash, "user", `친구 추가를 시도함.`)
+      if (!UserManager.contain(authorHash)) return reply(``);
+      let friend = message.replice(`${Default.prefix} 친구추가 `, "");
+      if (UserManager.contain(friend)) {
+        FriendsManager.addFriend(UserManager.findUserHash(authorHash)["id"], authorName, friend);
+        RecordManager.rcdAction(authorHash, "bot", `[${friend}]친구 추가를 성공함.`)
+        reply(`[${friend}]님을 친구로 추가했어요.`);
+        SystemManager.postMessage(friend, `[${authorName}]님이 당신을 친구로 추가했어요.`);
+      } else {
+        RecordManager.rcdAction(authorHash, "bot", `친구 추가를 실패함.`)
+        reply(`[${friend}]라는 사람이 누구야..?`);
+      }
+    }
+    if (splitMessage[2] === "삭제") {
+      RecordManager.rcdAction(authorHash, "user", `친구 삭제를 시도함.`)
+      if (!UserManager.contain(authorHash)) return reply(``);
+      let friend = message.replice(`${Default.prefix} 친구삭제 `, "");
+      if (UserManager.contain(friend)) {
+        FriendsManager.removeFriend(UserManager.findUserHash(authorHash)["id"], friend);
+        RecordManager.rcdAction(authorHash, "bot", `[${friend}]친구 삭제를 성공함.`)
+        reply(`[${friend}]님을 친구에서 삭제했어요.`);
+        SystemManager.postMessage(friend, `[${authorName}]님이 당신을 친구에서 삭제했어요.`);
+      } else {
+        RecordManager.rcdAction(authorHash, "bot", `친구 삭제를 실패함.`)
+        reply(`[${friend}]라는 사람이 누구야..?`);
+      }
+    }
+  }
+
+}
+
+//11/24 수정
+function checkCommandING(roomName) {
+
+}
+
+
+
+
+Array.prototype.getRandom = function () {
+  if (this.length === 0) return undefined;
+  const randomIndex = Math.floor(Math.random() * this.length);
+  return this[randomIndex];
 }

@@ -20,27 +20,48 @@ function UserManager() {
   let UserDump = new Common.DumpModule();
   // let OptDump = new Common.DumpModule();
 
-  let Load = function () {
-    let UserList = Common.read(Default.fileNameList["UserList"]);
+  let LoadData = function () {
+    let tmpList = Common.read(Default.fileNameList["UserList"]);
     for (let i = 0; i < tmpList.length; i++) userList.push(clsUser(tmpList[i]));
   }();
 
   let Contain = function (id) {
     for (let i = 0; i < userList.length; i++) {
-      if (userList[i].name === id) return i;
+      if (userList[i].id === id) return i;
+    }
+    return false
+  };
+  let ContainByHash = function (hash) {
+    for (let i = 0; i < userList.length; i++) {
+      if (userList[i].profileId === hash) return i;
     }
     return false
   };
 
   let Find = function (id) {
     for (let i = 0; i < UserDump.dumpList.length; i++) {
-      if (UserDump.dumpList[i].name === id) {
+      if (UserDump.dumpList[i].id === id) {
         UserDump.resetTimeStemp(i);
         return UserDump.dumpList[i];
       }
     }
     for (let i = 0; i < userList.length; i++) {
-      if (userList[i].name === id) {
+      if (userList[i].id === id) {
+        UserDump.addDump(userList[i]);
+        return userList[i];
+      }
+    }
+    return null;
+  };
+  let FindByHash = function (hash) {
+    for (let i = 0; i < UserDump.dumpList.length; i++) {
+      if (UserDump.dumpList[i].profileId === hash) {
+        UserDump.resetTimeStemp(i);
+        return UserDump.dumpList[i];
+      }
+    }
+    for (let i = 0; i < userList.length; i++) {
+      if (userList[i].profileId === hash) {
         UserDump.addDump(userList[i]);
         return userList[i];
       }
@@ -125,7 +146,7 @@ function UserManager() {
   }
 
   let Save = function () {
-    Common.write(Default.fileList["UserList"], MakeJson);
+    Common.write(Default.fileList["UserList"], MakeJson());
   }
 
   let RecivePost = function (user, item, coin) {
@@ -144,6 +165,12 @@ function UserManager() {
   }
 
   return {
+    contain: function (id) {
+      return Contain(id);
+    },
+    containByHash: function (id) {
+      return ContainByHash(id);
+    },
     deleteUser: function (id) {
       DeleteUser(id);
     },
@@ -196,8 +223,7 @@ function UserManager() {
     Betting: function (id, coin, target) {
       let user = Find(id);
       let rate = (Common.Random(1, 10) < 4 ? 1 : 2);
-      let winFlag;
-      let random;
+      let winFlag, random;
       if (obj === null) return "생성된 계정이 없어요.";
       if (obj.loan > 0) return "대출이 있어 도박을 할 수 없어요.";
       if (Number(coin) > Default.BettingCoinLimit) return [
@@ -326,16 +352,14 @@ function UserManager() {
       if (loan.index === "") return `현재 대출을 보유하고 있지 않아요.`
       let calcCoin = Math.floor(loan.coin * (1 + Number(DBLoan.rate)));
       if (calcCoin > user.coin) return [
-        `정산을 시작할게요.`,
-        ,
+        `정산을 시작할게요.`, ,
         `사용자가 보유한 재화가 부족해요.`
       ].join("\n");
       user.addCoin(-calcCoin);
       user.removeLoan();
       Save();
       return [
-        `정산을 시작할게요.`,
-        ,
+        `정산을 시작할게요.`, ,
         `${calcCoin}스타를 갚았어요.`
       ].join("\n");
     },
@@ -363,6 +387,9 @@ function UserManager() {
     //추후 사용
     findUser: function (id) {
       return Find(id);
+    },
+    findUserByHash: function (id) {
+      return FindByHash(id);
     },
     SaveUser: function () {
       Save();
