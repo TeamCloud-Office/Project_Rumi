@@ -7,67 +7,91 @@
 /////////////////
 
 
-Broadcast.send("Default"); //Default 불러오기
-Broadcast.send("Common"); //Common 불러오기
+let {
+  Default
+} = require("Default");
+let {
+  Common
+} = require("Common");
 
-function funcDBManager() {
-  let DB = {};
-  let DUMP = {};
+(function () {
+  function funcDBManager() {
+    let DB = {};
+    let json = [{
+      "index": Number,
+      "itemName": String,
+      "description": String,
+      "price": Number,
+      "upItem": String
+    }]
+    let DUMP = {};
 
-  return {
-    LoadData: function () {
+    let LoadData = function () {
       DB.Message = Common.read(Default.DBFileList["Message"]);
       DB.BasicItem = Common.read(Default.DBFileList["BasicItem"]);
-      DB.NicknameItem = Common.read(Default.DBFileList["NicknameItem"]);
+      DB.BadgeItem = Common.read(Default.DBFileList["BadgeItem"]);
       DB.StarsItem = Common.read(Default.DBFileList["StarsItem"]);
       DB.FoodItem = Common.read(Default.DBFileList["FoodItem"]);
       DB.TicketItem = Common.read(Default.DBFileList["TicketItem"]);
       DB.MineralItem = Common.read(Default.DBFileList["MineralItem"]);
+      DB.LoanItem = Common.read(Default.DBFileList["LoanItem"]);
 
       DUMP.Message = new Common.DumpModule();
       DUMP.BasicItem = new Common.DumpModule();
-      DUMP.NicknameItem = new Common.DumpModule();
+      DUMP.BadgeItem = new Common.DumpModule();
       DUMP.StarsItem = new Common.DumpModule();
       DUMP.FoodItem = new Common.DumpModule();
       DUMP.TicketItem = new Common.DumpModule();
       DUMP.MineralItem = new Common.DumpModule();
-    }(),
+      DUMP.LoanItem = new Common.DumpModule();
+    }();
 
-
-    Find: function (type, key, value) { //데이터 조회(성능 최적화)
+    let Find = function (type, key, value) { //데이터 조회(성능 최적화)
       let infos = DUMP[type].dumpList;
-      for (let i = 0; i < infos.length; i++) { //캐시에서 데이터 조회
-        if (infos[i][key] === value) {
+      if (value !== null) {
+        for (let i = 0; i < infos.length; i++) { //캐시에서 데이터 조회
+          if (infos[i][key] === value) {
+            DUMP[type].resetTimeStemp(i);
+            return infos[i];
+          }
+        }
+        infos = DB[type];
+        for (i = 0; i < infos.length; i++) { //캐시에 없음: 데이터베이스 조회, 캐시 업데이트
+          if (infos[i][key] === value) {
+            DUMP[type].addDump(infos[i]);
+            return infos[i];
+          }
+        }
+        return null;
+      } else {
+        let list;
+        for (let i = 0; i < infos.length; i++) { //캐시에서 데이터 조회
           DUMP[type].resetTimeStemp(i);
-          return infos[i];
+          list.push(infos[i]);
         }
-      }
-      infos = DB[type];
-      for (i = 0; i < infos.length; i++) {
-        if (infos[i][key] === value) { //캐시에 없음: 데이터베이스 조회, 캐시 업데이트
+        infos = DB[type];
+        for (i = 0; i < infos.length; i++) { //캐시에 없음: 데이터베이스 조회, 캐시 업데이트
           DUMP[type].addDump(infos[i]);
-          return infos[i];
+          list.push(infos[i]);
         }
+        return list;
       }
-      return null;
-    },
-
-
-    FindList: function (type, key, value) {
+    };
+    let FindList = function (type, key, value) {
       let infos = DB[type];
       let list = [];
+      if (key === "all") return infos;
       for (let i = 0; i < infos.length; i++) {
         if (infos[i][key] === value) list.push(infos[i]);
       }
       return list;
-    },
-
+    }
 
     /**
      * @param {String} name 아이템 이름
-     * @param {String} type 아이템 종류 ["NicknameItem","StarsItem","FoodItem","TicketItem","MandrelItem","MineralItem"]
+     * @param {String} type 아이템 종류 ["BadgeItem","StarsItem","FoodItem","TicketItem","MandrelItem","MineralItem"]
      */
-    Dictionary: function (name, type) {
+    let Dic = function (type, name) {
       let rtnStr = `[${name}의 검색 결과]\n\n`;
 
       if (type == "TicketItem") {
@@ -89,8 +113,8 @@ function funcDBManager() {
         }
       }
 
-      if (type == "NicknameItem") {
-        let obj = Find("NicknameItem", "itemName", name);
+      if (type == "BadgeItem") {
+        let obj = Find("BadgeItem", "itemName", name);
         if (obj !== null) {
           rtnStr += [
             `[닉네임]`,
@@ -99,7 +123,7 @@ function funcDBManager() {
             `\t- 설명 : ${obj["description"]}`
           ].join("\n")
 
-          let tmpObj = Find("NicknameItem", "itemName", obj["upItem"]);
+          let tmpObj = Find("BadgeItem", "itemName", obj["upItem"]);
           if (tmpObj === null) tmpList = [];
           if (tmpObj !== null) rtnStr += [
             `== 상위 닉네임 ==`,
@@ -178,30 +202,53 @@ function funcDBManager() {
       }
 
       return rtnStr;
-    },
+    };
 
-    getItem: function (key, value) {
-      if (key === "NicknameItem") return this.Find("NicknameItem", "itemName", value);
-      if (key === "StarsItem") return this.Find("StarsItem", "itemName", value);
-      if (key === "TicketItem") return this.Find("TicketItem", "itemName", value);
-      if (key === "FoodItem") return this.Find("FoodItem", "itemName", value);
-      if (key === "ManderlItem") return this.Find("MandrelItem", "itemName", value);
-      if (key === "MineralItem") return this.Find("MineralItem", "itemName", value);
-      return "";
-    },
-    isItem: function (key, value) {
-      if (key === "NicknameItem") return (this.Find("NicknameItem", "itemName", value) !== null ? true : false);
-      if (key === "StarsItem") return (this.Find("StarsItem", "itemName", value) !== null ? true : false);
-      if (key === "TicketItem") return (this.Find("TicketItem", "itemName", value) !== null ? true : false);
-      if (key === "FoodItem") return (this.Find("FoodItem", "itemName", value) !== null ? true : false);
-      if (key === "ManderlItem") return (this.Find("ManderItem", "itemName", value) !== null ? true : false);
-      if (key === "MineralItem") return (this.Find("MineralItem", "itemName", value) !== null ? true : false);
-      return "";
-    },
+    return {
+      Search: function (type, key, value) {
+        return Find(type, key, value);
+      },
 
+      Dictionary: function (name) {
+        return Dic(name);
+      },
+
+      getItem: function (type, value) {
+        if (Default.ItemType.includes(type)) return Find(type, "index", value);
+        return null;
+      },
+      isItem: function (type, value) {
+        return (this.getItem(type, value) !== null ? true : false);
+      },
+      getItemByName: function (itemName) {
+        for (let type of Default.ItemType) {
+          let obj = Find(type, "itemName", itemName);
+          if (obj !== null) return {
+            type,
+            obj
+          };
+        }
+        return {
+          type: null,
+          obj: null
+        };
+      },
+
+      getLoanList: function () {
+        return DB["LoanItem"];
+      },
+      getLoanByName: function (nameItem) {
+        return Find("LoanItem", "nameItem", nameItem);
+      },
+      getLoan: function (index) {
+        return Find("LoanItem", "index", index);
+      }
+    }
   }
-}
 
-Broadcast.register("DataBase", () => {
-  return eval(DataBase = funcDBManager())
-});
+  module.exports = {
+    DataBase: funcDBManager()
+  }
+
+
+})()

@@ -24,62 +24,67 @@
 // (bigint) msg.channelId: 각 방의 고유 id
 /////////////////
 
-function funcDefault() {
-  return {
-    Version: "1.0.0", //버전
-    defLog: true, //로그
-    More: "\n200b".repeat(500), //더보기
-    FS: FileStream, //FileStream
-    delay: java.lang.Thread.sleep,
+(function () {
+  function funcDefault() {
+    return {
+      Version: "1.0.0", //버전
+      defLog: true, //로그
+      More: "\n200b".repeat(500), //더보기
+      FS: FileStream, //FileStream
+      delay: java.lang.Thread.sleep,
 
-    RunTime: false, //RunTime 출력 유무 설정
-    SendErrorMessage: true, //오류 전송 여부
-    CommadnDelay: 60 * 1000, //명령어당 대기 시간
+      RunTime: false, //RunTime 출력 유무 설정
+      SendErrorMessage: true, //오류 전송 여부
+      CommandDelay: 60 * 1000, //명령어당 대기 시간
 
-    MainRoomName: "TeamCloud 개발방", //메인방 이름
-    CommandPrefix: "루미야", //접두사 설정
-    DumpTimeOut: 5 * 60 * 1000,
+      MainRoomName: "TeamCloud 개발방", //메인방 이름
+      CommandPrefix: "루미야", //접두사 설정
+      DumpTimeOut: 5 * 60 * 1000,
 
-    DefaultCoin: 50000, //초기 기본 Coin
-    BettingCoinLimit: 1000000, //최대 도박 한도
-    MaxRemittance: 500000, //최대 송금 한도
-    MiningDefaultSpeed: 60 * 1000, //채굴 시간 (ms)
-    BackupTime: 5, // 60// 1000, //자동 백업 시간
-    FavorabilityMaxCount: 99, //최대 호감도 횟수
-    Fullness: 100, //포만감
-    Hunger: 2, //허기(-)
+      DefaultCoin: 50000, //초기 기본 Coin
+      BettingCoinLimit: 1000000, //최대 도박 한도
+      MaxRemittance: 500000, //최대 송금 한도
+      MiningDefaultSpeed: 60 * 1000, //채굴 시간 (ms)
+      BackupTime: 5, // 60// 1000, //자동 백업 시간
+      FavorabilityMaxCount: 99, //최대 호감도 횟수
+      Fullness: 100, //포만감
+      Hunger: 2, //허기(-)
 
-    rootPath: "sdcard/TeamCloud/",
-    fileList: {
-      UserList: "Rumi_Data/Users/UserList.json",
-      AttenList: "Rumi_Data/Game/AttenList.json",
-      SetList: "Rumi_Data/ETC/SetList.json",
-      StockList: "Rumi_Data/Game/StockList.json",
-      PostList: "Rumi_Data/Users/PostList.json",
-      // RecordList: "Rumi_Data/Records/RecordList.json"
-    },
+      rootPath: "sdcard/TeamCloud/",
+      fileList: {
+        UserList: "Rumi_Data/Users/UserList.json",
+        AttenList: "Rumi_Data/Game/AttenList.json",
+        SetList: "Rumi_Data/ETC/SetList.json",
+        StockList: "Rumi_Data/Game/StockList.json",
+        PostList: "Rumi_Data/Users/PostList.json",
+        // RecordList: "Rumi_Data/Records/RecordList.json"
+      },
 
-    DBFileList: {
-      Message: "Rumi_Data/DB/Message.json",
-      BadgeItem: "Rumi_Data/DB/BadgeItem.json",
-      StarsItem: "Rumi_Data/DB/StarsItem.json",
-      FoodItem: "Rumi_Data/DB/FoodItem.json",
-      TicketItem: "Rumi_Data/DB/TicketItem.json",
-      MandrelItem: "Rumi_Data/DB/MandrelItem.json",
-      MineralItem: "Rumi_Data/DB/MineralItem.json"
-    },
+      DBFileList: {
+        Message: "Rumi_Data/DB/Message.json",
+        BadgeItem: "Rumi_Data/DB/BadgeItem.json",
+        StarsItem: "Rumi_Data/DB/StarsItem.json",
+        FoodItem: "Rumi_Data/DB/FoodItem.json",
+        TicketItem: "Rumi_Data/DB/TicketItem.json",
+        MandrelItem: "Rumi_Data/DB/MandrelItem.json",
+        MineralItem: "Rumi_Data/DB/MineralItem.json"
+      },
 
-    ItemType: {
-      BadgeItem: "BadgeItem", //배지
-      StarsItem: "StarsItem", //멤버쉽
-      FoodItem: "FoodItem", //음식
-      TicketItem: "TicketItem", //사용권
-      MandrelItem: "MandrelItem", //곡괭이
-      MineralItem: "MineralItem" //광석
+      ItemType: {
+        BadgeItem: "BadgeItem", //배지
+        StarsItem: "StarsItem", //멤버쉽
+        FoodItem: "FoodItem", //음식
+        TicketItem: "TicketItem", //사용권
+        MandrelItem: "MandrelItem", //곡괭이
+        MineralItem: "MineralItem" //광석
+      }
     }
   }
-}
 
-Broadcast.register("Default", () => {
-  return eval(Default = funcDefault())
-});
+
+  module.exports = {
+    Default: funcDefault()
+  }
+
+
+})()
